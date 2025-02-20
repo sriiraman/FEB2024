@@ -8,11 +8,8 @@ trigger:
 #     mac:
 #       operatingSystem: 'macos-latest'
 
-
 pool:
-  vmImage: $(vmImageName)
-
-
+  vmImage: 'ubuntu-latest'
 
 stages:
 - stage: Build
@@ -20,7 +17,7 @@ stages:
   - job: BuildJob
     steps:
     - bash: echo "Do the build"
-- stage: DevDeplo
+- stage: DevDeploy
   jobs:
   - deployment: DevDeployJob
     environment: Dev
@@ -29,7 +26,7 @@ stages:
         deploy:
           steps:
           - script: echo deploy to Dev
-- stage: QADeplo
+- stage: QADeploy 
   jobs:
   - deployment: QADeployJob
     environment: QA
