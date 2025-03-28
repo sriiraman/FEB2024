@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: sriiramanfeb 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sriiramanfeb
+  template:
+    metadata:
+      labels:
+        app: sriiramanfeb 
+    spec:
+      containers:
+        - name: sriiramanfeb 
+          image: azuredevopssri.azurecr.io/sriiramanfeb
+          ports:
+          - containerPort: 8000
