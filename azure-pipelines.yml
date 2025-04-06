@@ -1,28 +1,39 @@
-
 trigger:
-- master
+  branches:
+    include:
+      - main  # Trigger on changes to the 'main' branch
 
-# Variables
+pool:
+  vmImage: 'ubuntu-latest'  # Use the latest Ubuntu image
+
 variables:
-  tag: '$(Build.BuildId)'
+  buildConfiguration: 'Release'  # Set build configuration to Release
 
-stages:
-# Build Stage 
-- stage: Build
-  displayName: Build pannanum
-  jobs:
-  - job: Build
-    displayName: Build pannitiya
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps: 
- 
-    - task: Docker@2
+jobs:
+- job: Build
+  steps:
+    # Checkout the code from the repository
+    - task: Checkout@1
+      displayName: 'Checkout code'
+    
+    # Install .NET (or replace with any other SDK for your application)
+    - task: UseDotNet@2
       inputs:
-        containerRegistry: 'azuredevopssri'
-        repository: 'custom2aksnginxapp1'
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        tags: |
-          $(tag)
-          $(Build.SourceVersion)
+        packageType: 'sdk'
+        version: '6.x'  # Specify your required SDK version
+
+    # Restore dependencies
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore dependencies'
+      inputs:
+        command: 'restore'
+        projects: '**/*.csproj'
+
+    # Build the project
+    - task: DotNetCoreCLI@2
+      displayName: 'Build project'
+      inputs:
+        command: 'build'
+        projects: '**/*.csproj'
+        arguments: '--configuration $(buildConfiguration)'
+
