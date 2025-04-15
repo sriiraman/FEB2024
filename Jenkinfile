@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'your-dockerhub-username/my-app'
+        DOCKER_CREDENTIALS_ID = 'docker-hub-creds'
+        KUBECONFIG_CREDENTIAL_ID = 'kubeconfig'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/your-repo/your-project.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build(DOCKER_IMAGE)
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withDockerRegistry(credentialsId: DOCKER_CREDENTIALS_ID, url: '') {
+                    script {
+                        docker.image(DOCKER_IMAGE).push('latest')
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([file(credentialsId: KUBECONFIG_CREDENTIAL_ID, variable: 'KUBECONFIG')]) {
+                    sh 'kubectl apply -f k8s-deployment.yaml'
+                }
+            }
+        }
+    }
+}
